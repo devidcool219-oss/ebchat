@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAABdSURBVHgB7dJBDYAwDEDRbwIBSMAEJGAABxKYgAEkIAGBiIT13ZqT1WVP2S9pvq5VAgAAAAAAAAAAAAAAAAAAgG/3rLUh51y01lpNKaWstfZSSunGGPellLqU0n0YY2y11tpaawEAAAAAAAAAAAD4Ky/5vRih8+WoGAAAAABJRU5ErkJggg==">
+    <title>Team Messenger - Видеокружочки</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- Экран входа -->
+        <div class="login-screen" id="loginScreen">
+            <div class="login-card">
+                <div class="logo">
+                    <div class="logo-icon">💬</div>
+                    <h1>Team Messenger</h1>
+                </div>
+                <p>Введите ваше имя для входа</p>
+                <input type="text" id="usernameInput" placeholder="Ваше имя" maxlength="30" autocomplete="off">
+                <button id="loginBtn">Войти в чат</button>
+                <div class="online-preview">
+                    <span>👥 </span>
+                    <span id="onlinePreviewCount">0</span>
+                    <span> человек онлайн</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основной интерфейс чата -->
+        <div class="chat-app" id="chatApp" style="display: none;">
+            <!-- Боковая панель -->
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2>👥 Участники</h2>
+                    <button class="close-sidebar" id="closeSidebar">✕</button>
+                </div>
+                <div class="user-info">
+                    <div class="current-user" id="currentUser"></div>
+                </div>
+                <div class="users-list" id="usersList"></div>
+                <div class="status-info">
+                    <div class="online-count" id="onlineCount">0 онлайн</div>
+                    <div class="storage-info" id="storageInfo"></div>
+                </div>
+            </div>
+
+            <!-- Основная область чата -->
+            <div class="chat-main">
+                <div class="chat-header">
+                    <button class="menu-toggle" id="menuToggle">☰</button>
+                    <div class="chat-title">
+                        <h3>Общий чат</h3>
+                        <span class="chat-subtitle">Командный чат</span>
+                           <h3 id="chatTitle">Выберите пользователя</h3>
+    <span class="chat-subtitle">Личные сообщения</span>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator"></div>
+                </div>
+
+                <div class="messages-container" id="messagesContainer">
+                    <div class="messages" id="messages"></div>
+                </div>
+
+                <div class="input-area">
+                    <div class="message-input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Введите сообщение..." 
+                            rows="1"
+                            maxlength="1000"
+                        ></textarea>
+                        <button id="videoBtn" class="video-btn" title="Записать видеокружочек (до 10 сек)">
+                            <span>🎥</span>
+                        </button>
+                        <button id="sendBtn" class="send-btn" title="Отправить">
+                            <span>📤</span>
+                        </button>
+                    </div>
+                    <div class="input-hint">
+                        <span>⏎ Enter - отправить | ⇧ Shift+⏎ - новая строка | 🎥 - видеокружочек (до 10 сек)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для записи видео -->
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📹 Записать видеокружочек</h3>
+                <button class="close-modal" id="closeModal">✕</button>
+            </div>
+            <div class="video-preview">
+                <video id="videoPreview" autoplay muted playsinline></video>
+                <canvas id="videoCanvas" style="display: none;"></canvas>
+                    <button id="switchCameraBtn" class="switch-camera-btn" style="display: none;">🔄</button>
+                
+                    <div class="record-timer" id="recordTimer">0:00</div>
+                <div class="record-progress">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="record-controls">
+                    <button id="startRecordBtn" class="record-btn start">
+                        <span>🔴</span> Начать запись
+                    </button>
+                    <button id="stopRecordBtn" class="record-btn stop" style="display: none;">
+                        <span>⏹️</span> Остановить
+                    </button>
+                    <button id="sendVideoBtn" class="send-video-btn" style="display: none;">
+                        📤 Отправить кружочек
+                    </button>
+                    <button id="cancelVideoBtn" class="cancel-video-btn" style="display: none;">
+                        ❌ Отмена
+                    </button>
+                </div>
+            </div>
+            <div class="video-info">
+                <p>🎥 Видеокружочек - круглое видео до 10 секунд</p>
+                <p>💡 После записи вы сможете просмотреть и отправить</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+<!-- Кнопка диагностики -->
+<button id="debugBtn" style="position: fixed; bottom: 10px; right: 10px; z-index: 99999; background: #333; color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 10px;">🐛 Диагностика</button>
+
+<div id="debugPanel" style="position: fixed; bottom: 50px; right: 10px; background: #333; color: #0f0; padding: 10px; border-radius: 5px; font-size: 10px; z-index: 99999; max-width: 80%; display: none; font-family: monospace;">
+</div>
+</html>
