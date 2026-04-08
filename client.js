@@ -435,7 +435,7 @@ loginBtn.addEventListener('click', () => {
     socket.emit('user:login', username, (response) => {
         if (response.success) {
             currentUser = response.user;
-            allUsers = response.allUsers.filter(u => u.username !== currentUser.username);
+            allUsers = (response.allUsers || []).filter(u => u.username !== currentUser.username);
             
             loginScreen.style.display = 'none';
             chatApp.style.display = 'flex';
@@ -854,6 +854,8 @@ socket.on('users:list', (onlineUsers) => {
 });
 
 // ============ ВОССТАНОВЛЕНИЕ СОЕДИНЕНИЯ ============
+
+
 
 socket.on('connect', () => {
     console.log('Соединение восстановлено');
